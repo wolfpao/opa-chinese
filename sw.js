@@ -1,10 +1,11 @@
 /* 離線快取：裝到主畫面後沒有網路也能玩 */
-const CACHE = "opa-chinese-v4";
+const CACHE = "opa-chinese-v5";
 const CORE = [
   "./", "./index.html", "./recorder.html", "./manifest.json",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-180.png", "./images/avatar.png",
   "./music/song1.m4a", "./music/song2.m4a", "./music/song3.m4a",
-  "./music/song4.m4a", "./music/song5.m4a", "./music/song6.m4a", "./music/song7.m4a"
+  "./music/song4.m4a", "./music/song5.m4a", "./music/song6.m4a", "./music/song7.m4a",
+  "./music/song8.m4a", "./music/song9.m4a", "./music/song10.m4a", "./music/song11.m4a"
 ];
 
 self.addEventListener("install", e => {

@@ -82,6 +82,10 @@
   .m5{background:linear-gradient(135deg,#c490ff,#9a6bff);}
   .m6{background:linear-gradient(135deg,#ffa94d,#ff6f91);}
   .m7{background:linear-gradient(135deg,#4dd0e1,#3fa9f5);}
+  .m8{background:linear-gradient(135deg,#ff9a9e,#fad0c4);}
+  .m9{background:linear-gradient(135deg,#a18cd1,#fbc2eb);}
+  .m10{background:linear-gradient(135deg,#84fab0,#8fd3f4);}
+  .m11{background:linear-gradient(135deg,#ffd86f,#fc6262);}
 
   /* L1 FLASHCARD */
   .card{
@@ -186,6 +190,10 @@
       <button class="m5" onclick="playMusic(4)">🐯<span>兩隻老虎</span></button>
       <button class="m6" onclick="playMusic(5)">🎤<span>Little Talk</span></button>
       <button class="m7" onclick="playMusic(6)">✨<span>小星星</span></button>
+      <button class="m8" onclick="playMusic(7)">🎵<span>音樂 8</span></button>
+      <button class="m9" onclick="playMusic(8)">🎶<span>音樂 9</span></button>
+      <button class="m10" onclick="playMusic(9)">🥁<span>音樂 10</span></button>
+      <button class="m11" onclick="playMusic(10)">🎸<span>音樂 11</span></button>
     </div>
   </div>
 </div>
@@ -398,7 +406,8 @@ renderThemes(); updateMenu();
 
 /* ---------- 音樂（小孫女喜歡的歌） ---------- */
 const SONGS = ["music/song1.m4a","music/song2.m4a","music/song3.m4a",
-  "music/song4.m4a","music/song5.m4a","music/song6.m4a","music/song7.m4a"];
+  "music/song4.m4a","music/song5.m4a","music/song6.m4a","music/song7.m4a",
+  "music/song8.m4a","music/song9.m4a","music/song10.m4a","music/song11.m4a"];
 let curSong = -1;
 function musicBtns(){ return document.querySelectorAll(".musicrow button"); }
 function stopMusic(){
