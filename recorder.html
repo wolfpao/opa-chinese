@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>錄音小幫手 · 跟爺爺學中文</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{margin:0;font-family:"PingFang TC","Microsoft JhengHei",system-ui,sans-serif;color:#3a3a3a;
+       background:linear-gradient(160deg,#fff7e6,#ffe3ec);min-height:100vh;padding:18px;}
+  h1{color:#ff7aa2;text-align:center;margin:6px 0 2px;font-size:clamp(24px,6vw,36px);}
+  .lead{text-align:center;color:#b06;opacity:.8;margin-bottom:8px;}
+  .steps{background:#fff;border-radius:18px;padding:14px 18px;max-width:640px;margin:0 auto 18px;
+         box-shadow:0 8px 20px rgba(0,0,0,.1);font-size:15px;line-height:1.7;}
+  .steps b{color:#ff5e8a;}
+  #mic{max-width:640px;margin:0 auto 14px;text-align:center;}
+  #mic button{border:none;border-radius:16px;padding:12px 22px;font-size:17px;font-weight:700;color:#fff;
+              background:linear-gradient(135deg,#7a8dff,#6cc4ff);box-shadow:0 6px 16px rgba(0,0,0,.15);cursor:pointer;}
+  .grid{display:flex;flex-direction:column;gap:14px;max-width:640px;margin:0 auto;}
+  .row{background:#fff;border-radius:22px;padding:16px;box-shadow:0 8px 20px rgba(0,0,0,.1);
+       display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .emoji{font-size:54px;}
+  .info{flex:1;min-width:120px;}
+  .zh{font-size:26px;font-weight:800;}
+  .pinyin{color:#999;font-size:15px;}
+  .file{color:#7a8dff;font-size:13px;font-family:monospace;margin-top:2px;}
+  .ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .ctrls button{border:none;border-radius:14px;padding:12px 16px;font-size:16px;font-weight:700;cursor:pointer;
+                box-shadow:0 4px 10px rgba(0,0,0,.12);}
+  .rec{background:#ff5e8a;color:#fff;min-width:96px;}
+  .rec.recording{background:#d62246;animation:pulse 1s infinite;}
+  @keyframes pulse{50%{opacity:.55}}
+  .play{background:#fff;}
+  .dl{background:#7ed957;color:#fff;}
+  .dl:disabled,.play:disabled{opacity:.4;cursor:not-allowed;}
+  .done{color:#3fbf7f;font-weight:800;font-size:22px;width:24px;text-align:center;}
+  .hint{max-width:640px;margin:18px auto;text-align:center;color:#b06;font-size:14px;opacity:.8;}
+  a.back{display:inline-block;margin-top:6px;color:#7a8dff;}
+</style>
+</head>
+<body>
+<h1>🎤 錄音小幫手</h1>
+<div class="lead">照著螢幕念，把爺爺的聲音錄進遊戲</div>
+
+<div class="steps">
+  <b>步驟：</b><br>
+  1️⃣ 先按下面的「🎙 開啟麥克風」（瀏覽器會問，請按允許）<br>
+  2️⃣ 每一列按 <b>● 錄音</b> → 念出那個詞 → 再按一次 <b>停止</b><br>
+  3️⃣ 按 <b>▶ 試聽</b> 確認清楚，不滿意就重錄<br>
+  4️⃣ 按 <b>⬇ 下載</b>，檔案會存到「下載」資料夾<br>
+  5️⃣ 全部錄完，把下載的檔案<b>移到遊戲的 <code>audio</code> 資料夾</b>即可，遊戲會自動用你的聲音 🎉
+</div>
+
+<div id="mic"><button onclick="initMic()">🎙 開啟麥克風</button> <span id="micStatus"></span></div>
+
+<div class="grid" id="grid"></div>
+
+<div class="hint">
+  小提醒：安靜環境、念清楚慢一點、每個詞念 1 次（約 1 秒）就好。<br>
+  <a class="back" href="index.html">← 回到遊戲</a>
+</div>
+
+<script>
+const ANIMALS = [
+  {id:"dog",    zh:"小狗",  pinyin:"xiǎo gǒu", emoji:"🐶"},
+  {id:"cat",    zh:"小貓",  pinyin:"xiǎo māo", emoji:"🐱"},
+  {id:"bird",   zh:"小鳥",  pinyin:"xiǎo niǎo",emoji:"🐦"},
+  {id:"fish",   zh:"魚",    pinyin:"yú",       emoji:"🐟"},
+  {id:"rabbit", zh:"兔子",  pinyin:"tù zi",    emoji:"🐰"},
+  {id:"elephant",zh:"大象", pinyin:"dà xiàng", emoji:"🐘"},
+  {id:"lion",   zh:"獅子",  pinyin:"shī zi",   emoji:"🦁"},
+  {id:"bear",   zh:"熊",    pinyin:"xióng",    emoji:"🐻"},
+  {id:"monkey", zh:"猴子",  pinyin:"hóu zi",   emoji:"🐵"},
+  {id:"cow",    zh:"牛",    pinyin:"niú",      emoji:"🐮"},
+  {id:"red",    zh:"紅色",  pinyin:"hóng sè",  emoji:"🔴"},
+  {id:"yellow", zh:"黃色",  pinyin:"huáng sè", emoji:"🟡"},
+  {id:"blue",   zh:"藍色",  pinyin:"lán sè",   emoji:"🔵"},
+  {id:"green",  zh:"綠色",  pinyin:"lǜ sè",    emoji:"🟢"},
+  {id:"orange", zh:"橘色",  pinyin:"jú sè",    emoji:"🟠"},
+  {id:"purple", zh:"紫色",  pinyin:"zǐ sè",    emoji:"🟣"},
+  {id:"brown",  zh:"棕色",  pinyin:"zōng sè",  emoji:"🟤"},
+  {id:"black",  zh:"黑色",  pinyin:"hēi sè",   emoji:"⚫"},
+  {id:"white",  zh:"白色",  pinyin:"bái sè",   emoji:"⚪"},
+  {id:"pink",   zh:"粉紅色",pinyin:"fěn hóng sè",emoji:"🩷"},
+  {id:"n1",  zh:"一",  pinyin:"yī",   emoji:"1️⃣"},
+  {id:"n2",  zh:"二",  pinyin:"èr",   emoji:"2️⃣"},
+  {id:"n3",  zh:"三",  pinyin:"sān",  emoji:"3️⃣"},
+  {id:"n4",  zh:"四",  pinyin:"sì",   emoji:"4️⃣"},
+  {id:"n5",  zh:"五",  pinyin:"wǔ",   emoji:"5️⃣"},
+  {id:"n6",  zh:"六",  pinyin:"liù",  emoji:"6️⃣"},
+  {id:"n7",  zh:"七",  pinyin:"qī",   emoji:"7️⃣"},
+  {id:"n8",  zh:"八",  pinyin:"bā",   emoji:"8️⃣"},
+  {id:"n9",  zh:"九",  pinyin:"jiǔ",  emoji:"9️⃣"},
+  {id:"n10", zh:"十",  pinyin:"shí",  emoji:"🔟"},
+  {id:"yeye",   zh:"爺爺", pinyin:"yé ye",   emoji:"👴"},
+  {id:"nainai", zh:"奶奶", pinyin:"nǎi nai", emoji:"👵"},
+  {id:"baba",   zh:"爸爸", pinyin:"bà ba",   emoji:"👨"},
+  {id:"mama",   zh:"媽媽", pinyin:"mā ma",   emoji:"👩"},
+  {id:"gege",   zh:"哥哥", pinyin:"gē ge",   emoji:"👦"},
+  {id:"meimei", zh:"妹妹", pinyin:"mèi mei", emoji:"👧"},
+  {id:"baobao", zh:"寶寶", pinyin:"bǎo bao", emoji:"👶"},
+  {id:"jia",    zh:"全家", pinyin:"quán jiā",emoji:"👨‍👩‍👧‍👦"},
+  {id:"apple",  zh:"蘋果", pinyin:"píng guǒ", emoji:"🍎"},
+  {id:"banana", zh:"香蕉", pinyin:"xiāng jiāo",emoji:"🍌"},
+  {id:"milk",   zh:"牛奶", pinyin:"niú nǎi",  emoji:"🥛"},
+  {id:"bread",  zh:"麵包", pinyin:"miàn bāo", emoji:"🍞"},
+  {id:"egg",    zh:"蛋",   pinyin:"dàn",      emoji:"🥚"},
+  {id:"water",  zh:"水",   pinyin:"shuǐ",     emoji:"💧"},
+  {id:"rice",   zh:"飯",   pinyin:"fàn",      emoji:"🍚"},
+  {id:"noodles",zh:"麵",   pinyin:"miàn",     emoji:"🍜"},
+  {id:"cake",   zh:"蛋糕", pinyin:"dàn gāo",  emoji:"🍰"},
+  {id:"cookie", zh:"餅乾", pinyin:"bǐng gān", emoji:"🍪"},
+];
+
+let stream=null, mime="", ext="webm";
+const blobs={};   // id -> blob
+
+function pickMime(){
+  const cands=["audio/mp4","audio/webm","audio/ogg"];
+  for(const c of cands){ if(window.MediaRecorder && MediaRecorder.isTypeSupported(c)) return c; }
+  return "";
+}
+function extFor(m){ if(m.includes("mp4"))return"m4a"; if(m.includes("ogg"))return"ogg"; return"webm"; }
+
+async function initMic(){
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    mime = pickMime(); ext = extFor(mime);
+    document.getElementById("micStatus").textContent = "✅ 麥克風已開啟，可以開始錄了";
+    document.querySelectorAll(".rec").forEach(b=>b.disabled=false);
+  }catch(e){
+    document.getElementById("micStatus").textContent = "❌ 無法開啟麥克風："+e.message;
+  }
+}
+
+function render(){
+  const grid=document.getElementById("grid");
+  grid.innerHTML="";
+  ANIMALS.forEach(it=>{
+    const row=document.createElement("div"); row.className="row";
+    row.innerHTML=`
+      <div class="emoji">${it.emoji}</div>
+      <div class="info">
+        <div class="zh">${it.zh}</div>
+        <div class="pinyin">${it.pinyin}</div>
+        <div class="file" id="f-${it.id}">audio/${it.id}.${ext}</div>
+      </div>
+      <div class="ctrls">
+        <button class="rec" id="rec-${it.id}" disabled>● 錄音</button>
+        <button class="play" id="play-${it.id}" disabled>▶ 試聽</button>
+        <button class="dl" id="dl-${it.id}" disabled>⬇ 下載</button>
+        <span class="done" id="done-${it.id}"></span>
+      </div>`;
+    grid.appendChild(row);
+    row.querySelector(`#rec-${it.id}`).onclick=()=>toggleRec(it.id);
+    row.querySelector(`#play-${it.id}`).onclick=()=>playBlob(it.id);
+    row.querySelector(`#dl-${it.id}`).onclick=()=>download(it.id);
+  });
+}
+render();
+
+let recorder=null, recId=null, chunks=[];
+function toggleRec(id){
+  if(recId===id){ recorder.stop(); return; }      // 停止目前這列
+  if(recId){ return; }                             // 別列正在錄，先停它
+  chunks=[]; recId=id;
+  recorder=new MediaRecorder(stream, mime?{mimeType:mime}:undefined);
+  recorder.ondataavailable=e=>{ if(e.data.size)chunks.push(e.data); };
+  recorder.onstop=()=>{
+    blobs[id]=new Blob(chunks,{type:mime||"audio/webm"});
+    document.getElementById(`f-${id}`).textContent=`audio/${id}.${ext}`;
+    document.getElementById(`play-${id}`).disabled=false;
+    document.getElementById(`dl-${id}`).disabled=false;
+    document.getElementById(`done-${id}`).textContent="🎙";
+    const b=document.getElementById(`rec-${id}`); b.textContent="● 重錄"; b.classList.remove("recording");
+    recId=null;
+  };
+  recorder.start();
+  const b=document.getElementById(`rec-${id}`); b.textContent="■ 停止"; b.classList.add("recording");
+}
+function playBlob(id){ if(blobs[id]) new Audio(URL.createObjectURL(blobs[id])).play(); }
+function download(id){
+  if(!blobs[id]) return;
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blobs[id]); a.download=`${id}.${ext}`;
+  document.body.appendChild(a); a.click(); a.remove();
+  document.getElementById(`done-${id}`).textContent="✅";
+}
+</script>
+</body>
+</html>

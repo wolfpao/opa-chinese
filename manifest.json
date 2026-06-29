@@ -1,0 +1,17 @@
+{
+  "name": "跟爺爺學中文",
+  "short_name": "學中文",
+  "description": "給德國小孫女的中文互動遊戲 · Chinesisch lernen mit Opa",
+  "lang": "zh-Hant",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fff7e6",
+  "theme_color": "#ff7aa2",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
