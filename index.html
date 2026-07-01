@@ -346,6 +346,11 @@ function tts(text){
   if(v) u.voice = v;
   speechSynthesis.speak(u);
 }
+/* 答錯鼓勵：先播預錄「再試試看」音檔，沒有才用手機合成（Android 無中文語音也有聲） */
+function encourage(){
+  const a = new Audio("audio/_tryagain.m4a");
+  a.play().then(()=>{}).catch(()=>tts("再試試看"));
+}
 /* 唸德文：先播預錄德文音檔(de/)，沒有才用手機內建語音合成
    —— 因為很多 Android 手機沒裝德語語音,合成會靜音,預錄音檔則每台都能響 */
 function deSlug(s){
@@ -488,7 +493,7 @@ function pickL2(btn,opt){
     playReward(()=>{ l2lock=false; nextL2(); });   // 等歌播完才出下一題
   }else{
     btn.classList.add("wrong");
-    tts("再試試看");
+    encourage();
     setTimeout(()=>btn.classList.remove("wrong"),500);
   }
 }
