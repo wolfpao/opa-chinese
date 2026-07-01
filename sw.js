@@ -1,5 +1,5 @@
 /* 離線快取：裝到主畫面後沒有網路也能玩 */
-const CACHE = "opa-chinese-v8";
+const CACHE = "opa-chinese-v9";
 const CORE = [
   "./", "./index.html", "./recorder.html", "./manifest.json",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-180.png", "./images/avatar.png",
@@ -19,14 +19,29 @@ self.addEventListener("activate", e => {
   );
 });
 
-/* cache-first：先用快取，沒有再連網並順手存起來（含爺爺的錄音檔） */
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
-  e.respondWith(
-    caches.match(e.request).then(hit =>
-      hit || fetch(e.request).then(resp => {
+  const req = e.request;
+  const isHTML = req.mode === "navigate" || (req.headers.get("accept") || "").includes("text/html");
+
+  if (isHTML) {
+    // 網頁(HTML)用 network-first：永遠先抓最新,離線才用快取 → 更新不會卡舊版
+    e.respondWith(
+      fetch(req).then(resp => {
         const copy = resp.clone();
-        caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
+        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+        return resp;
+      }).catch(() => caches.match(req).then(r => r || caches.match("./index.html")))
+    );
+    return;
+  }
+
+  // 其他靜態資源(音檔/圖/音樂)用 cache-first：快、省流量,離線可用
+  e.respondWith(
+    caches.match(req).then(hit =>
+      hit || fetch(req).then(resp => {
+        const copy = resp.clone();
+        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
         return resp;
       }).catch(() => hit)
     )
