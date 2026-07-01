@@ -277,16 +277,16 @@ const THEMES = {
     {id:"pink",   zh:"粉紅色",pinyin:"fěn hóng sè",de:"Rosa",   emoji:"🩷"},
   ]},
   numbers: { name:"數字", de:"Zahlen", findDe:"Such die Zahl!", icon:"🔢", items:[
-    {id:"n1",  zh:"一",  pinyin:"yī",   de:"Eins",   emoji:"1️⃣"},
-    {id:"n2",  zh:"二",  pinyin:"èr",   de:"Zwei",   emoji:"2️⃣"},
-    {id:"n3",  zh:"三",  pinyin:"sān",  de:"Drei",   emoji:"3️⃣"},
-    {id:"n4",  zh:"四",  pinyin:"sì",   de:"Vier",   emoji:"4️⃣"},
-    {id:"n5",  zh:"五",  pinyin:"wǔ",   de:"Fünf",   emoji:"5️⃣"},
-    {id:"n6",  zh:"六",  pinyin:"liù",  de:"Sechs",  emoji:"6️⃣"},
-    {id:"n7",  zh:"七",  pinyin:"qī",   de:"Sieben", emoji:"7️⃣"},
-    {id:"n8",  zh:"八",  pinyin:"bā",   de:"Acht",   emoji:"8️⃣"},
-    {id:"n9",  zh:"九",  pinyin:"jiǔ",  de:"Neun",   emoji:"9️⃣"},
-    {id:"n10", zh:"十",  pinyin:"shí",  de:"Zehn",   emoji:"🔟"},
+    {id:"n1",  zh:"一",  pinyin:"yī",   de:"Eins",   emoji:"1️⃣", disp:"1"},
+    {id:"n2",  zh:"二",  pinyin:"èr",   de:"Zwei",   emoji:"2️⃣", disp:"2"},
+    {id:"n3",  zh:"三",  pinyin:"sān",  de:"Drei",   emoji:"3️⃣", disp:"3"},
+    {id:"n4",  zh:"四",  pinyin:"sì",   de:"Vier",   emoji:"4️⃣", disp:"4"},
+    {id:"n5",  zh:"五",  pinyin:"wǔ",   de:"Fünf",   emoji:"5️⃣", disp:"5"},
+    {id:"n6",  zh:"六",  pinyin:"liù",  de:"Sechs",  emoji:"6️⃣", disp:"6"},
+    {id:"n7",  zh:"七",  pinyin:"qī",   de:"Sieben", emoji:"7️⃣", disp:"7"},
+    {id:"n8",  zh:"八",  pinyin:"bā",   de:"Acht",   emoji:"8️⃣", disp:"8"},
+    {id:"n9",  zh:"九",  pinyin:"jiǔ",  de:"Neun",   emoji:"9️⃣", disp:"9"},
+    {id:"n10", zh:"十",  pinyin:"shí",  de:"Zehn",   emoji:"🔟", disp:"10"},
   ]},
   family: { name:"家人", de:"Familie", findDe:"Wer ist das?", icon:"👨‍👩‍👧‍👦", items:[
     {id:"yeye",   zh:"爺爺", pinyin:"yé ye",   de:"Opa",             emoji:"👴"},
@@ -315,7 +315,7 @@ let currentTheme = localStorage.getItem("theme") || "animals";
 function ITEMS(){ return THEMES[currentTheme].items; }
 
 /* ---------- 版本號（顯示在首頁底部，方便確認裝置抓到的版本） ---------- */
-const APP_VERSION = "v9";
+const APP_VERSION = "v10";
 document.getElementById("ver").textContent = "版本 " + APP_VERSION;
 
 /* ---------- PWA：註冊離線快取（只在 http(s) 有效，file:// 會自動略過） ---------- */
@@ -475,7 +475,7 @@ function nextL2(){
   l2answer = ITEMS()[Math.floor(Math.random()*ITEMS().length)];
   const wrongs = shuffle(ITEMS().filter(a=>a.id!==l2answer.id)).slice(0,2);
   const opts = shuffle([l2answer, ...wrongs]);
-  document.getElementById("l2word").textContent = l2answer.zh;
+  document.getElementById("l2word").textContent = l2answer.disp || l2answer.zh;
   document.getElementById("l2wordDe").textContent = l2answer.de;
   const box = document.getElementById("l2choices");
   box.innerHTML="";
@@ -511,7 +511,7 @@ function nextL3(){
   l3answer = ITEMS()[Math.floor(Math.random()*ITEMS().length)];
   const wrongs = shuffle(ITEMS().filter(a=>a.id!==l3answer.id)).slice(0,5);
   const opts = shuffle([l3answer, ...wrongs]);
-  document.getElementById("l3word").textContent = l3answer.zh;
+  document.getElementById("l3word").textContent = l3answer.disp || l3answer.zh;
   document.getElementById("l3wordDe").textContent = l3answer.de;
   const box=document.getElementById("l3scene"); box.innerHTML="";
   opts.forEach(o=>{
