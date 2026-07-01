@@ -1,5 +1,5 @@
 /* 離線快取：裝到主畫面後沒有網路也能玩 */
-const CACHE = "opa-chinese-v7";
+const CACHE = "opa-chinese-v8";
 const CORE = [
   "./", "./index.html", "./recorder.html", "./manifest.json",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-180.png", "./images/avatar.png",

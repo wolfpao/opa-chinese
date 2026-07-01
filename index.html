@@ -68,6 +68,7 @@
 
   /* music picker */
   .musicpick{margin-top:16px;text-align:center;}
+  .ver{margin-top:14px;font-size:12px;color:#b06;opacity:.45;text-align:center;}
   .musicrow{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;max-width:min(760px,95vw);margin:0 auto;}
   .musicrow button{border:none;border-radius:22px;padding:14px 16px;min-width:96px;max-width:130px;font-size:38px;color:#fff;
     box-shadow:var(--shadow);cursor:pointer;transition:transform .1s;display:flex;flex-direction:column;align-items:center;gap:4px;}
@@ -196,6 +197,7 @@
       <button class="m11" onclick="playMusic(10)">🌼<span>茉莉花</span></button>
     </div>
   </div>
+  <div class="ver" id="ver"></div>
 </div>
 <audio id="player" onended="musicEnded()"></audio>
 
@@ -311,6 +313,10 @@ const THEMES = {
 };
 let currentTheme = localStorage.getItem("theme") || "animals";
 function ITEMS(){ return THEMES[currentTheme].items; }
+
+/* ---------- 版本號（顯示在首頁底部，方便確認裝置抓到的版本） ---------- */
+const APP_VERSION = "v8";
+document.getElementById("ver").textContent = "版本 " + APP_VERSION;
 
 /* ---------- PWA：註冊離線快取（只在 http(s) 有效，file:// 會自動略過） ---------- */
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){
