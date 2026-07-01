@@ -346,8 +346,18 @@ function tts(text){
   if(v) u.voice = v;
   speechSynthesis.speak(u);
 }
-/* 唸德文（de-DE） */
+/* 唸德文：先播預錄德文音檔(de/)，沒有才用手機內建語音合成
+   —— 因為很多 Android 手機沒裝德語語音,合成會靜音,預錄音檔則每台都能響 */
+function deSlug(s){
+  return s.toLowerCase()
+    .replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss")
+    .replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"");
+}
 function ttsDe(text){
+  const a = new Audio("de/" + deSlug(text) + ".m4a");
+  a.play().then(()=>{}).catch(()=>ttsDeSpeak(text));   // 沒音檔就退回合成
+}
+function ttsDeSpeak(text){
   if(!("speechSynthesis" in window)) return;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
